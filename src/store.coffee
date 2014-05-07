@@ -5,6 +5,7 @@ define ['services/services'], (services) ->
   # 1. Return callbacks in CRUD actions
   # 2. Extend it with local searching capabilities
   # 3. Implement Log module for errors
+  # 4. Switch to angular foreach later on?
 
   services.factory 'Store', [
     '$window'
@@ -13,7 +14,6 @@ define ['services/services'], (services) ->
     ($window, $log, $parse) ->
       return (name, config) ->
 
-        # Get entry by ID
         getEntryId = (entry) ->
           try
             return idGetter(entry)
@@ -21,11 +21,9 @@ define ['services/services'], (services) ->
             return null
           return
 
-        # Create our LawnChair object
         LawnChair = (callback) ->
           new Lawnchair {name: name}, callback
 
-        # Save entry
         saveEntry = (data, key) ->
           key = key.toString()
           if angular.isObject(data) and data isnt collection[key]
@@ -46,10 +44,8 @@ define ['services/services'], (services) ->
             $log.info 'LocalStorage Exception ==> ' + e.message
           return
 
-        # Update array
         updateArray = (data) ->
           array.length = 0
-          # TODO: Switch to angular loop later on
           _.each data, (o) ->
             array.push o
             return
@@ -63,7 +59,6 @@ define ['services/services'], (services) ->
             collection[key] = obj
           return
 
-        # Update cache from storage
         updateCacheFromStorage = (cache, storage) ->
           if storage
             if angular.isObject(storage.value) and angular.isObject(cache)
@@ -73,7 +68,6 @@ define ['services/services'], (services) ->
             updateCache cache, storage.key
           cache
 
-        # Treat as collection
         allAsCollection = (callback) ->
           LawnChair ->
             @all (result) ->
@@ -85,7 +79,6 @@ define ['services/services'], (services) ->
             return
           collection
 
-        # Treat as array
         allAsArray = (callback) ->
           updateArray allAsCollection((data) ->
             updateArray data
@@ -93,7 +86,6 @@ define ['services/services'], (services) ->
             return
           )
 
-        # Remove entry
         removeEntry = (key) ->
           delete collection[key]
           LawnChair ->
@@ -101,7 +93,6 @@ define ['services/services'], (services) ->
             return
           return
 
-        # Get default
         getDefault = (key) ->
           if collection[key]
             collection[key]
@@ -110,7 +101,6 @@ define ['services/services'], (services) ->
             idGetter.assign d, key
             d
 
-        # Define containers
         collection = {}
         array = []
         isArray = config and config.isArray
@@ -118,36 +108,31 @@ define ['services/services'], (services) ->
         transformSave = (if (config and config.transformSave) then config.transformSave else angular.identity)
         transformLoad = (if (config and config.transformLoad) then config.transformLoad else angular.identity)
 
-        # Create Store object
         Store =
 
-        # Pass the collection
           collection: collection
 
-        # Save a record
           save: (key, data, clear) ->
             unless data
-              data = collection # if nothing is set save the current cache
+              data = collection
               key = null
             if angular.isArray(data)
-              angular.forEach data, (e, index) -> # Save a Array
+              angular.forEach data, (e, index) ->
                 saveEntry e, getEntryId(e) or index
                 return
             else if key or (data and getEntryId(data))
-              saveEntry data, key or getEntryId(data) # save one entry
+              saveEntry data, key or getEntryId(data)
             else
-              angular.forEach data, saveEntry # save a collection
+              angular.forEach data, saveEntry
             if clear
               newIds = (if angular.isArray(data) then _.chain(data).map(getEntryId).map(String).value() else _.keys(data))
               _.chain(collection).keys().difference(newIds).each removeEntry
-              # remove entries without ids
               _.chain(collection).filter((entry) ->
                 not getEntryId(entry)
               ).keys().each removeEntry
             updateArray collection if isArray
             return
 
-        # Batch treat records
           batch: (keys, target, callback) ->
             cache = _.chain(keys).map((k) ->
               getDefault k
@@ -171,7 +156,6 @@ define ['services/services'], (services) ->
               return
             target
 
-        # Get record(s)
           get: (key, callback) ->
             value = getDefault(key)
             LawnChair ->
@@ -182,20 +166,16 @@ define ['services/services'], (services) ->
               return
             value
 
-        # Treat all
           all: (if isArray then allAsArray else allAsCollection)
 
-        # Remove a record
           remove: removeEntry
 
-        # Nuke localStorage
           nuke: ->
             LawnChair ->
               @nuke()
               return
             return
 
-        # Destroy a collection
           destroy: ->
             for key of collection
               delete collection[key]
@@ -204,7 +184,6 @@ define ['services/services'], (services) ->
               return
             return
 
-        # Return our Store object
         Store
   ]
   return

@@ -1,18 +1,30 @@
 'use strict'
 
 module.exports = (grunt) ->
+
+  grunt.loadNpmTasks 'grunt-contrib-coffee'
+  grunt.loadNpmTasks 'grunt-contrib-watch'
+
   grunt.initConfig
 
-    uglify:
+    coffee:
       options:
-        banner: '/*!\n * LawnchairJS based storage\n * <%= grunt.template.today(\'dd-mm-yyyy hh:mm\') %>\n */\n'
-
+        sourceMap:  true
+        sourceRoot: ''
       dist:
-        files:
-          'store.min.js': 'store.js'
+        files: [
+          expand: true
+          cwd:    ''
+          src:    '{,*/}*.coffee'
+          dest:   ''
+          ext:    '.js'
+        ]
 
-  grunt.loadNpmTasks 'grunt-contrib-uglify'
+    watch:
+      files: ['{,*/}*.coffee']
+      tasks: ['coffee']
 
-  grunt.registerTask 'default', ['uglify']
+  grunt.registerTask 'build', ['watch']
+
 
   return

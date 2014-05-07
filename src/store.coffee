@@ -125,7 +125,7 @@ define ['services/services'], (services) ->
           collection: collection
 
         # Save a record
-          save: (data, key, clear) ->
+          save: (key, data, clear) ->
             unless data
               data = collection # if nothing is set save the current cache
               key = null

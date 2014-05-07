@@ -114,7 +114,7 @@
           transformLoad = (config && config.transformLoad ? config.transformLoad : angular.identity);
           Store = {
             collection: collection,
-            save: function(data, key, clear) {
+            save: function(key, data, clear) {
               var newIds;
               if (!data) {
                 data = collection;

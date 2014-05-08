@@ -116,21 +116,28 @@ define ['services/services'], (services) ->
             unless data
               data = collection
               key = null
-            if angular.isArray(data)
-              angular.forEach data, (e, index) ->
-                saveEntry e, getEntryId(e) or index
-                return
-            else if key or (data and getEntryId(data))
-              saveEntry data, key or getEntryId(data)
-            else
-              angular.forEach data, saveEntry
+            saveEntry data, key or getEntryId(data)
+
+#            Temporarily disabled because of the arrayed data load
+#            if angular.isArray(data)
+#              angular.forEach data, (e, index) ->
+#                saveEntry e, getEntryId(e) or index
+#                return
+#            else if key or (data and getEntryId(data))
+#              saveEntry data, key or getEntryId(data)
+#            else
+#              angular.forEach data, saveEntry
+
             if clear
               newIds = (if angular.isArray(data) then _.chain(data).map(getEntryId).map(String).value() else _.keys(data))
               _.chain(collection).keys().difference(newIds).each removeEntry
               _.chain(collection).filter((entry) ->
                 not getEntryId(entry)
               ).keys().each removeEntry
-            updateArray collection if isArray
+
+#            Probably not used
+#            updateArray collection if isArray
+
             return
 
           batch: (keys, target, callback) ->

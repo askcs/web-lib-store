@@ -168,6 +168,13 @@ define ['services/services'], (services) ->
             LawnChair ->
               @get key, (result) ->
                 value = updateCacheFromStorage(value, result) if result
+                # TODO: Solve permanently in a better way
+                # Little hack for de-serializing array-object back to an array
+                if value.hasOwnProperty("0")
+                  value = _.map(value, (_value) ->
+                    _value
+                  )
+                  value.pop()
                 callback value if callback
                 return
               return

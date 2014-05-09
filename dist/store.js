@@ -167,6 +167,12 @@
                   if (result) {
                     value = updateCacheFromStorage(value, result);
                   }
+                  if (value.hasOwnProperty("0")) {
+                    value = _.map(value, function(_value) {
+                      return _value;
+                    });
+                    value.pop();
+                  }
                   if (callback) {
                     callback(value);
                   }

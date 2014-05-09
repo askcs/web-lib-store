@@ -5,8 +5,7 @@
   "dependencies": {
     "grunt": "~0.4.2",
     "grunt-contrib-coffee": "^0.10.1",
-    "grunt-contrib-watch": "^0.6.1",
-    "matchdep": "^0.3.0"
+    "grunt-contrib-watch": "^0.6.1"
   },
   "devDependencies": {},
   "repository": {
